@@ -6,3 +6,6 @@ on google maps.
 python lightning_app.py
 
 This produces a html file with the positions of the latest lightning strucks shown. As in the example file test.html.
+
+## Example output
+![Example of plot](/examples/example.png)
