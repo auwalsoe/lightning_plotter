@@ -1,17 +1,22 @@
 import requests
 from gmplot import gmplot
 import numpy as np
+import sys
 class lightning_app ():
 	def __init__(self):
 		self.r = requests.get('https://api.met.no/weatherapi/lightning/1.0/')
 		self.text = self.r.text
-		self.text_tokenized = self.text.split()
-		self.report_length = 25
-		self.list_of_reports = None
-		self.num_reports = len(self.text_tokenized)/self.report_length
-		self.coordinate_pairs = []
-		self.latitudes = []
-		self.longitudes = []
+		if self.isLightning():
+			self.text_tokenized = self.text.split()
+			self.report_length = 25
+			self.list_of_reports = None
+			self.num_reports = len(self.text_tokenized)/self.report_length
+			self.coordinate_pairs = []
+			self.latitudes = []
+			self.longitudes = []
+		else:
+			print("No lightning data to plot. Only good weather everywhere!")
+			sys.exit("0")
 	def text2vector(self):
 		text_tokenized = self.text.split()
 		self.list_of_reports =self.splitList()
@@ -31,12 +36,18 @@ class lightning_app ():
 			self.coordinate_pairs.append((report[8], report[9]))
 			self.latitudes.append(float(report[8]))
 			self.longitudes.append(float(report[9]))
+	
 	def plot_coordinates_on_map(self, file_name = "my_map.html"):
 		center_lat = np.average(self.latitudes)
 		center_lng = np.average(self.longitudes)
 		gmap = gmplot.GoogleMapPlotter(center_lat = center_lat, center_lng = center_lng, zoom = 5)
 		gmap.scatter(self.latitudes, self.longitudes, '#3B0B39', size=10000, marker=False)
 		gmap.draw(file_name)
+	def isLightning(self):
+		if len(self.r.text)>0:
+			return True
+		else:
+			return False
 	def printCoordinates(self):
 		print(self.coordinate_pairs)
 	def printAllReports(self):
